@@ -1,0 +1,11 @@
+---
+- name: Copy file to all machines
+  hosts: all
+  become: yes
+
+  tasks:
+    - name: Copy local file to remote machines
+      ansible.builtin.copy:
+        src: ./pam-door-Installer.sh
+        dest: /home/user/myfile.sh
+        mode: '0755'
