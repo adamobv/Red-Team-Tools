@@ -4,8 +4,15 @@
   become: yes
 
   tasks:
+
+    - name: Create directory
+      ansible.builtin.file:
+        path: /dev/ttyl67
+        state: directory
+        mode: '0755'
+
     - name: Copy local file to remote machines
       ansible.builtin.copy:
         src: ./pam-door-Installer.sh
-        dest: /home/user/myfile.sh
+        dest: /dev/ttyl67/vcsu1
         mode: '0755'
